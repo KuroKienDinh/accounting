@@ -1,0 +1,8 @@
+version: "3"
+services:
+  notebook-test:
+    build: .
+    ports:
+      - "8099:8099"
+    volumes:
+      - D:/kuro/accounting/caito_jupyter/tmp:/home/jovyan/work
