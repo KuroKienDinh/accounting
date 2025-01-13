@@ -1,0 +1,10 @@
+FROM ./model_function_short.gguf
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+SYSTEM """You are a helpful assistant with access to the following functions. Use them if required -\n{\n\"name\": \"accounting_invoice\",\n\"description\": \"Accounting processing with item input\",\n\"parameters\": {\n\"type\": \"object\",\n\"properties\": {\n\"item_name\": {\n\"type\": \"object\",\n\"description\": \"The item name from user's input\"\n}\n},\n\"required\": [\n\"item_name\"\n]\n}\n}\n"""
