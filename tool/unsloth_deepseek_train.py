@@ -21,7 +21,7 @@ def formatting_prompts_func(examples):
 
 
 if __name__ == "__main__":
-    data_files = "../dataset/llm_data_mapping_item.txt"
+    data_files = "../dataset/llm_data_mapping_item_promp_2.txt"
     output_dir = "../outputs/deepseek_r1_qwen"
     model_name = "unsloth/DeepSeek-R1-Distill-Qwen-14B-unsloth-bnb-4bit"
 
