@@ -7,28 +7,12 @@ from unsloth import FastLanguageModel
 from unsloth import is_bfloat16_supported
 from unsloth.chat_templates import train_on_responses_only
 
-
-def formatting_prompts_func(examples):
-    # examples["text"] is a list of JSON strings (one per line in the txt file)
-    convos = []
-    for record in examples["text"]:
-        # Convert JSON string to a Python list of {role, content} dicts
-        conversation = json.loads(record)
-        convos.append(conversation)
-
-    texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos]
-    return {"text": texts}
-
-
 data_files = "../dataset/llm_data_mapping_item_promp_2.txt"
 output_dir = "../outputs/deepseek_r1_qwen"
 model_name = "unsloth/DeepSeek-R1-Distill-Qwen-14B-unsloth-bnb-4bit"
 
 max_seq_length = 2048  # Choose any! We auto support RoPE Scaling internally!
 load_in_4bit = True  # Use 4bit quantization to reduce memory usage. Can be False.
-
-dataset = load_dataset("text", data_files=data_files)
-dataset = dataset["train"].map(formatting_prompts_func, batched=True, num_proc=1)
 
 model, tokenizer = FastLanguageModel.from_pretrained(model_name=model_name, max_seq_length=max_seq_length, load_in_4bit=load_in_4bit, dtype=None)
 
@@ -45,6 +29,22 @@ model = FastLanguageModel.get_peft_model(
     use_rslora=False,  # We support rank stabilized LoRA
     loftq_config=None,  # And LoftQ
 )
+
+
+def formatting_prompts_func(examples):
+    # examples["text"] is a list of JSON strings (one per line in the txt file)
+    convos = []
+    for record in examples["text"]:
+        # Convert JSON string to a Python list of {role, content} dicts
+        conversation = json.loads(record)
+        convos.append(conversation)
+
+    texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos]
+    return {"text": texts}
+
+
+dataset = load_dataset("text", data_files=data_files)
+dataset = dataset["train"].map(formatting_prompts_func, batched=True, num_proc=1)
 
 trainer = SFTTrainer(
     model=model,
